@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,21 +15,27 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const { loginUser } = useAuthStore();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     const success = await loginUser(username, password);
     setLoading(false);
 
     if (success) {
-      window.location.href = "/";
+      toast.success(`Welcome back, ${username}!`);
+
+      // small delay to let the toast appear before redirect
+      setTimeout(() => {
+        router.push("/");
+      }, 300);
     } else {
-      alert("Invalid email or password");
+      toast.error("Invalid username or password");
     }
   };
 
@@ -45,7 +53,7 @@ export function LoginForm({
                   <Label htmlFor="email">Username</Label>
                   <Input
                     id="username"
-                    type="string"
+                    type="text"
                     placeholder="Enter your username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}

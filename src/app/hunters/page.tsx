@@ -32,7 +32,7 @@ export default function HuntersPage() {
   }, []);
 
   useEffect(() => {
-    if (!isLoggedIn) return; // only run if logged in
+    if (!isLoggedIn || !mounted) return; // only run if logged in
 
     const loadHunters = async () => {
       setLoading(true);
@@ -51,9 +51,9 @@ export default function HuntersPage() {
     };
 
     loadHunters();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, mounted]);
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !mounted) {
     return (
       <div className="text-center mt-20">
         <h2 className="text-2xl font-semibold mb-4">You are not logged in</h2>
