@@ -1,9 +1,9 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { username, password } = await req.json();
 
-  const response = await fetch("http://localhost:8000/api/token/", {
+  const response = await fetch(`${process.env.DJANGO_API_URL}/token/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -11,8 +11,19 @@ export async function POST(req: NextRequest) {
 
   const data = await response.json();
 
-  return new Response(JSON.stringify(data), {
-    status: response.status,
-    headers: { "Content-Type": "application/json" },
-  });
+  if (response.ok) {
+    // Create a NextResponse and attach cookie
+    const res = NextResponse.json(data, { status: response.status });
+
+    res.cookies.set("access_token", data.access, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60, // 1 hour
+    });
+
+    return res;
+  }
+
+  return NextResponse.json(data, { status: response.status });
 }
