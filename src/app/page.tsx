@@ -1,17 +1,17 @@
 import Image from "next/image";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
   return (
     <div className="flex flex-col items-center gap-8 p-6">
       {/* Original Heading */}
-      <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
-        <span className="text-teal-800">Hunter Network:</span> The Joke Tax
-        Chronicles
+      <h1 className="scroll-m-20 text-center text-6xl font-extrabold tracking-tight text-balance text-teal-800">
+        Welcome to Hunter Network
       </h1>
-
-      <Separator className="w-24 border-t-2 border-teal-800" />
+      <h4 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+        Connect, collaborate, and conquer challenges together in the world of
+        hunters.
+      </h4>
 
       {/* Feature Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-5xl">
