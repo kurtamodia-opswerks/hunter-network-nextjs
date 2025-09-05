@@ -9,7 +9,7 @@ async function proxyFetch(url: string, options: RequestInit, token?: string) {
     ...options.headers,
   };
 
-  const res = await fetch(url, { ...options, headers, cache: "no-store" });
+  const res = await fetch(url, { ...options, headers });
   const data = await res.text();
   let json;
   try {
@@ -21,29 +21,46 @@ async function proxyFetch(url: string, options: RequestInit, token?: string) {
   return NextResponse.json(json, { status: res.status });
 }
 
-// GET all hunters
-export async function GET(req: NextRequest) {
+// GET a single hunter
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const token = req.cookies.get("access_token")?.value;
-  const url = new URL(req.url);
-  const searchParams = url.searchParams.toString();
-  const apiUrl = `${DJANGO_API_URL}/hunters/${
-    searchParams ? `?${searchParams}` : ""
-  }`;
-
-  return proxyFetch(apiUrl, { method: "GET" }, token);
+  return proxyFetch(
+    `${DJANGO_API_URL}/hunters/${params.id}/`,
+    { method: "GET" },
+    token
+  );
 }
 
-// POST a new hunter
-export async function POST(req: NextRequest) {
+// UPDATE a single hunter
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const token = req.cookies.get("access_token")?.value;
   const body = await req.json();
 
   return proxyFetch(
-    `${DJANGO_API_URL}/hunters/`,
+    `${DJANGO_API_URL}/hunters/${params.id}/`,
     {
-      method: "POST",
+      method: "PUT",
       body: JSON.stringify(body),
     },
+    token
+  );
+}
+
+// DELETE a single hunter
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const token = req.cookies.get("access_token")?.value;
+  return proxyFetch(
+    `${DJANGO_API_URL}/hunters/${params.id}/`,
+    { method: "DELETE" },
     token
   );
 }

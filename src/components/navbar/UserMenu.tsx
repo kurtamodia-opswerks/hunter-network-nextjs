@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import useAuthStore from "@/store/useAuthStore";
+import { useAuthActions, useAuthState } from "@/store/useAuthStore";
 import Link from "next/link";
 import {
   NavigationMenuList,
@@ -27,8 +27,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function UserMenu() {
-  const { logoutUser, user } = useAuthStore();
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const { isLoggedIn, user } = useAuthState();
+  const { logoutUser } = useAuthActions();
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
 
   const handleLogout = () => {

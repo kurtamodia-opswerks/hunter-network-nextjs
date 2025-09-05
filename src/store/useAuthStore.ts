@@ -17,108 +17,89 @@ interface DecodedUser {
   is_leader: boolean;
 }
 
-interface AuthState {
-  authTokens: AuthTokens | null;
-  user: DecodedUser | null;
-  isLoggedIn: boolean;
+// Actions interface
+interface AuthActions {
   loginUser: (username: string, password: string) => Promise<boolean>;
   refreshToken: () => Promise<void>;
   logoutUser: () => void;
 }
 
+interface AuthState {
+  authTokens: AuthTokens | null;
+  user: DecodedUser | null;
+  isLoggedIn: boolean;
+  actions: AuthActions;
+}
+
 const useAuthStore = create<AuthState>((set, get) => {
-  // Load tokens from cookies
   const access = Cookies.get("access_token") || null;
   const refresh = Cookies.get("refresh_token") || null;
   const tokens = access && refresh ? { access, refresh } : null;
-
-  console.log("[INIT] Loaded tokens from cookies:", { access, refresh });
 
   return {
     authTokens: tokens,
     user: access ? jwtDecode<DecodedUser>(access) : null,
     isLoggedIn: !!tokens,
 
-    // Login
-    loginUser: async (username, password) => {
-      console.log("[LOGIN] Attempting login for:", username);
-
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (res.ok) {
-        const data: AuthTokens = await res.json();
-        console.log("[LOGIN] API response tokens:", data);
-
-        // Save tokens in cookies
-        Cookies.set("access_token", data.access, { expires: 1 });
-        Cookies.set("refresh_token", data.refresh, { expires: 7 });
-        console.log("[LOGIN] Tokens saved to cookies");
-
-        set({
-          authTokens: data,
-          user: jwtDecode<DecodedUser>(data.access),
-          isLoggedIn: true,
+    actions: {
+      loginUser: async (username, password) => {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
         });
 
-        console.log("[LOGIN] User decoded and stored:", jwtDecode(data.access));
+        if (res.ok) {
+          const data: AuthTokens = await res.json();
+          Cookies.set("access_token", data.access, { expires: 1 });
+          Cookies.set("refresh_token", data.refresh, { expires: 7 });
 
-        return true;
-      }
+          set({
+            authTokens: data,
+            user: jwtDecode<DecodedUser>(data.access),
+            isLoggedIn: true,
+          });
 
-      console.log("[LOGIN] Login failed");
-      return false;
-    },
+          return true;
+        }
 
-    // Logout
-    logoutUser: () => {
-      console.log("[LOGOUT] Clearing cookies and state");
-      Cookies.remove("access_token");
-      Cookies.remove("refresh_token");
+        return false;
+      },
 
-      set({ authTokens: null, user: null, isLoggedIn: false });
-    },
+      logoutUser: () => {
+        Cookies.remove("access_token");
+        Cookies.remove("refresh_token");
 
-    // Refresh
-    refreshToken: async () => {
-      const { authTokens } = get();
-      console.log("[REFRESH] Current tokens before refresh:", authTokens);
+        set({ authTokens: null, user: null, isLoggedIn: false });
+      },
 
-      if (!authTokens?.refresh) {
-        console.log("[REFRESH] No refresh token found, logging out");
-        get().logoutUser();
-        return;
-      }
+      refreshToken: async () => {
+        const { authTokens, actions } = get();
+        if (!authTokens?.refresh) {
+          actions.logoutUser();
+          return;
+        }
 
-      const res = await fetch("/api/auth/refresh", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh: authTokens.refresh }),
-      });
-
-      if (res.ok) {
-        const data: { access: string } = await res.json();
-        console.log("[REFRESH] API response new access token:", data.access);
-
-        const updatedTokens = { ...authTokens, access: data.access };
-
-        Cookies.set("access_token", data.access, { expires: 1 });
-        console.log("[REFRESH] Updated access_token in cookies");
-
-        set({
-          authTokens: updatedTokens,
-          user: jwtDecode<DecodedUser>(data.access),
-          isLoggedIn: true,
+        const res = await fetch("/api/auth/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh: authTokens.refresh }),
         });
 
-        console.log("[REFRESH] Tokens updated in state");
-      } else {
-        console.log("[REFRESH] Refresh failed, logging out");
-        get().logoutUser();
-      }
+        if (res.ok) {
+          const data: { access: string } = await res.json();
+          const updatedTokens = { ...authTokens, access: data.access };
+          Cookies.set("access_token", data.access, { expires: 1 });
+
+          set({
+            authTokens: updatedTokens,
+            user: jwtDecode<DecodedUser>(data.access),
+            isLoggedIn: true,
+          });
+        } else {
+          actions.logoutUser();
+        }
+      },
     },
   };
 });
@@ -126,9 +107,10 @@ const useAuthStore = create<AuthState>((set, get) => {
 // Auto-refresh every 59 minutes
 if (typeof window !== "undefined") {
   setInterval(() => {
-    console.log("[AUTO REFRESH] Running...");
-    useAuthStore.getState().refreshToken();
+    useAuthStore.getState().actions.refreshToken();
   }, 59 * 60 * 1000);
 }
 
-export default useAuthStore;
+// Export individual actions as functions
+export const useAuthActions = () => useAuthStore((state) => state.actions);
+export const useAuthState = () => useAuthStore((state) => state);

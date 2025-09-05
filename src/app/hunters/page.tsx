@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import HunterCard from "@/components/hunters/HunterCard";
-import useAuthStore from "@/store/useAuthStore";
+import { useAuthState } from "@/store/useAuthStore";
 
 interface Hunter {
   id: number;
@@ -18,7 +18,7 @@ interface Hunter {
 
 export default function HuntersPage() {
   // States
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const { isLoggedIn } = useAuthState();
   const [mounted, setMounted] = useState(false);
 
   // Data

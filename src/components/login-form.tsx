@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import useAuthStore from "@/store/useAuthStore";
+import { useAuthActions } from "@/store/useAuthStore";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { loginUser } = useAuthStore();
+  const { loginUser } = useAuthActions();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,10 +30,7 @@ export function LoginForm({
     if (success) {
       toast.success(`Welcome back, ${username}!`);
 
-      // small delay to let the toast appear before redirect
-      setTimeout(() => {
-        router.push("/");
-      }, 300);
+      router.push("/");
     } else {
       toast.error("Invalid username or password");
     }
@@ -50,7 +47,7 @@ export function LoginForm({
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="email">Username</Label>
+                  <Label htmlFor="username">Username</Label>
                   <Input
                     id="username"
                     type="text"
