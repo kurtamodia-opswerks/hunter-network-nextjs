@@ -4,44 +4,26 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import HunterCard from "@/components/hunters/HunterCard";
 import { useAuthState } from "@/store/useAuthStore";
-
-interface Hunter {
-  id: number;
-  full_name: string;
-  email: string;
-  rank: string;
-  rank_display: string;
-  guild_name?: string;
-  power_level: number;
-  raid_count: number;
-}
+import { getHunters, Hunter } from "@/lib/api";
 
 export default function HuntersPage() {
-  // States
   const { isLoggedIn } = useAuthState();
   const [mounted, setMounted] = useState(false);
 
-  // Data
   const [hunters, setHunters] = useState<Hunter[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAllPower, setShowAllPower] = useState(false);
   const [showAllRaid, setShowAllRaid] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (!isLoggedIn || !mounted) return; // only run if logged in
+    if (!isLoggedIn || !mounted) return;
 
     const loadHunters = async () => {
       setLoading(true);
       try {
-        const res = await fetch("/api/hunters", { cache: "no-store" });
-
-        if (!res.ok) throw new Error("Failed to fetch hunters");
-
-        const data = await res.json();
+        const data = await getHunters();
         setHunters(data);
       } catch (err) {
         console.error("Failed to fetch hunters:", err);
