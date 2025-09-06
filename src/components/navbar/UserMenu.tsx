@@ -25,8 +25,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function UserMenu() {
+  const router = useRouter();
   const { isLoggedIn, user } = useAuthState();
   const { logoutUser } = useAuthActions();
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
@@ -34,6 +36,7 @@ export default function UserMenu() {
   const handleLogout = () => {
     logoutUser();
     toast.success("You have been logged out.");
+    router.push("/");
     setOpenLogoutDialog(false);
   };
 
