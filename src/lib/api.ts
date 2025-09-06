@@ -1,48 +1,29 @@
-// src/lib/api.ts
-export interface RegisterHunterData {
-  email: string;
-  first_name: string;
-  last_name: string;
-  username: string;
-  password: string;
-  rank: string;
+import { fetcher } from "./fetcher";
+import { Hunter, RegisterHunterData, UpdateHunterData } from "@/types/hunter";
+
+export async function getHunter(id: number) {
+  return fetcher<Hunter>(`/api/hunters/${id}`);
 }
 
-export interface Hunter {
-  id: number;
-  full_name: string;
-  email: string;
-  rank: string;
-  rank_display: string;
-  guild_name?: string;
-  power_level: number;
-  raid_count: number;
+export async function getHunters() {
+  return fetcher<Hunter[]>("/api/hunters");
 }
 
-// Register a new hunter
 export async function registerHunter(data: RegisterHunterData) {
-  const res = await fetch("/api/hunters", {
+  return fetcher("/api/hunters", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
-    cache: "no-store",
   });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => null);
-    throw new Error(errorData?.message || "Registration failed");
-  }
-
-  return res.json();
 }
 
-// Get all hunters
-export async function getHunters() {
-  const res = await fetch("/api/hunters", { cache: "no-store" });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch hunters");
-  }
-
-  return res.json() as Promise<Hunter[]>;
+export async function updateHunter(
+  id: number,
+  data: UpdateHunterData
+): Promise<Hunter> {
+  return fetcher<Hunter>(`/api/hunters/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 }

@@ -21,12 +21,12 @@ async function proxyFetch(url: string, options: RequestInit, token?: string) {
   return NextResponse.json(json, { status: res.status });
 }
 
-// GET a single hunter
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const token = req.cookies.get("access_token")?.value;
+  console.log("token: ", token);
   return proxyFetch(
     `${DJANGO_API_URL}/hunters/${params.id}/`,
     { method: "GET" },
@@ -34,25 +34,19 @@ export async function GET(
   );
 }
 
-// UPDATE a single hunter
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const token = req.cookies.get("access_token")?.value;
   const body = await req.json();
-
   return proxyFetch(
     `${DJANGO_API_URL}/hunters/${params.id}/`,
-    {
-      method: "PUT",
-      body: JSON.stringify(body),
-    },
+    { method: "PUT", body: JSON.stringify(body) },
     token
   );
 }
 
-// DELETE a single hunter
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
