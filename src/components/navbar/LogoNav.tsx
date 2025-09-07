@@ -32,6 +32,11 @@ export default function LogoNav() {
             <Link href="/hunters">Hunters</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild>
+            <Link href="/guilds">Guilds</Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
       </NavigationMenuList>
     </div>
   );
