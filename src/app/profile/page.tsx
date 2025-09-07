@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthState } from "@/store/useAuthStore";
 import { useHunterState, useHunterActions } from "@/store/useHunterStore";
 import { UpdateHunterData } from "@/types/hunter";
@@ -35,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { user } = useAuthState();
   const { hunter } = useHunterState();
   const { getHunter, updateHunter } = useHunterActions();
@@ -65,7 +67,12 @@ export default function ProfilePage() {
     });
   }, [hunter]);
 
-  if (!hunter || !formData) return <p>Loading profile...</p>;
+  if (!hunter || !formData)
+    return (
+      <p className="flex w-full items-center justify-center">
+        Loading profile...
+      </p>
+    );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -184,7 +191,13 @@ export default function ProfilePage() {
             <Button type="button" onClick={handleSaveClick}>
               Save
             </Button>
-            <Button type="button" variant="outline" onClick={() => {}}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                router.push("/");
+              }}
+            >
               Cancel
             </Button>
           </CardFooter>

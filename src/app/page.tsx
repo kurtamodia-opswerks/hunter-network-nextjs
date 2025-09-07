@@ -21,9 +21,9 @@ export default function Home() {
             <Image
               src="/features/hunters.png"
               alt="View Hunters"
-              width={80}
-              height={80}
-              className="rounded-full"
+              width={160}
+              height={160}
+              className="w-auto h-auto"
             />
             <CardTitle>View Hunters</CardTitle>
           </CardHeader>
@@ -39,9 +39,9 @@ export default function Home() {
             <Image
               src="/features/guilds.png"
               alt="Join Guilds"
-              width={80}
-              height={80}
-              className="rounded-full"
+              width={160}
+              height={160}
+              className="w-auto h-auto"
             />
             <CardTitle>Join Guilds</CardTitle>
           </CardHeader>
@@ -55,11 +55,11 @@ export default function Home() {
         <Card className="text-center hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-col items-center gap-2">
             <Image
-              src="/features/raids.png"
+              src="/features/raids.jpg"
               alt="Raids"
-              width={80}
-              height={80}
-              className="rounded-full"
+              width={160}
+              height={160}
+              className="w-auto h-auto"
             />
             <CardTitle>Raids</CardTitle>
           </CardHeader>
