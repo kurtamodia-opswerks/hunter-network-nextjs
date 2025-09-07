@@ -1,21 +1,25 @@
-// app/hunters/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import HunterCard from "@/components/hunters/HunterCard";
 import { useAuthState } from "@/store/useAuthStore";
 import { getHunters } from "@/lib/api";
 import { Hunter } from "@/types/hunter";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Loader2 } from "lucide-react";
+import HunterList from "@/components/hunters/HunterList";
+import HunterFilters from "@/components/hunters/HunterFilters";
 
 export default function HuntersPage() {
-  const { isLoggedIn } = useAuthState();
-  const [mounted, setMounted] = useState(false);
+  const { isLoggedIn, user } = useAuthState();
 
+  const [mounted, setMounted] = useState(false);
   const [hunters, setHunters] = useState<Hunter[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAllPower, setShowAllPower] = useState(false);
-  const [showAllRaid, setShowAllRaid] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
+
+  const [search, setSearch] = useState("");
+  const [ordering, setOrdering] = useState("-power_level_annotated");
+  const debouncedSearch = useDebounce(search, 1000);
 
   useEffect(() => setMounted(true), []);
 
@@ -25,17 +29,18 @@ export default function HuntersPage() {
     const loadHunters = async () => {
       setLoading(true);
       try {
-        const data = await getHunters();
+        const data = await getHunters({ search: debouncedSearch, ordering });
         setHunters(data);
       } catch (err) {
         console.error("Failed to fetch hunters:", err);
       } finally {
         setLoading(false);
+        setFirstLoad(false);
       }
     };
 
     loadHunters();
-  }, [isLoggedIn, mounted]);
+  }, [isLoggedIn, mounted, debouncedSearch, ordering]);
 
   if (!isLoggedIn || !mounted) {
     return (
@@ -46,7 +51,8 @@ export default function HuntersPage() {
     );
   }
 
-  if (loading) {
+  // show full-page loader only for the very first load
+  if (firstLoad && loading) {
     return (
       <div className="text-center mt-20">
         <p className="text-lg">Loading hunters...</p>
@@ -54,59 +60,27 @@ export default function HuntersPage() {
     );
   }
 
-  const powerRankings = [...hunters].sort(
-    (a, b) => b.power_level - a.power_level
-  );
-  const raidLeaders = [...hunters].sort((a, b) => b.raid_count - a.raid_count);
-
-  const displayedPower = showAllPower
-    ? powerRankings
-    : powerRankings.slice(0, 5);
-  const displayedRaid = showAllRaid ? raidLeaders : raidLeaders.slice(0, 5);
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold text-center">Hunter Rankings</h1>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Power Rankings */}
-        <section>
-          <h2 className="text-xl font-semibold mb-4 text-center">
-            Power Rankings
-          </h2>
-          <div className="space-y-4">
-            {displayedPower.map((h) => (
-              <HunterCard key={h.id} hunter={h} isAdmin={false} />
-            ))}
-          </div>
-          {!showAllPower && powerRankings.length > 5 && (
-            <div className="flex justify-center mt-4">
-              <Button onClick={() => setShowAllPower(true)}>
-                View Full List
-              </Button>
-            </div>
-          )}
-        </section>
+      <HunterFilters
+        search={search}
+        setSearch={setSearch}
+        ordering={ordering}
+        setOrdering={setOrdering}
+        loading={loading}
+        firstLoad={firstLoad}
+      />
 
-        {/* Raid Leaders */}
-        <section>
-          <h2 className="text-xl font-semibold mb-4 text-center">
-            Raid Leaders
-          </h2>
-          <div className="space-y-4">
-            {displayedRaid.map((h) => (
-              <HunterCard key={h.id} hunter={h} isAdmin={false} />
-            ))}
-          </div>
-          {!showAllRaid && raidLeaders.length > 5 && (
-            <div className="flex justify-center mt-4">
-              <Button onClick={() => setShowAllRaid(true)}>
-                View Full List
-              </Button>
-            </div>
-          )}
-        </section>
-      </div>
+      {/* subtle loader for subsequent loads */}
+      {loading && !firstLoad && (
+        <div className="flex justify-center mb-4">
+          <Loader2 className="animate-spin text-gray-500 w-5 h-5" />
+        </div>
+      )}
+
+      <HunterList hunters={hunters} isAdmin={!!user?.is_admin} />
     </div>
   );
 }

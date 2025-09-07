@@ -24,7 +24,7 @@ import { Guild } from "@/types/guild";
 
 interface GuildCardProps {
   guild: Guild;
-  isAdmin?: boolean; // <-- optional now
+  isAdmin?: boolean;
   onEdit?: (guild: Guild) => void;
   onDelete?: (id: number) => void;
   setDeletingGuild?: (guild: Guild) => void;
@@ -77,7 +77,7 @@ export default function GuildCard({
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => setDeletingGuild?.(guild)} // ✅ safe call
+                  onClick={() => setDeletingGuild?.(guild)}
                 >
                   <Trash />
                   Delete
@@ -95,7 +95,7 @@ export default function GuildCard({
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={() => onDelete?.(guild.id)} // ✅ safe call
+                    onClick={() => onDelete?.(guild.id)}
                     className="bg-red-500 hover:bg-red-600"
                   >
                     Delete

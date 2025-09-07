@@ -1,4 +1,3 @@
-import { memo } from "react";
 import GuildCard from "@/components/guilds/GuildCard";
 import { Guild } from "@/types/guild";
 
@@ -7,7 +6,7 @@ interface GuildListProps {
   isAdmin: boolean;
 }
 
-const GuildList = memo(({ guilds, isAdmin }: GuildListProps) => {
+export default function GuildList({ guilds, isAdmin }: GuildListProps) {
   return (
     <div className="space-y-4">
       {guilds.map((g) => (
@@ -15,8 +14,4 @@ const GuildList = memo(({ guilds, isAdmin }: GuildListProps) => {
       ))}
     </div>
   );
-});
-
-GuildList.displayName = "GuildList";
-
-export default GuildList;
+}

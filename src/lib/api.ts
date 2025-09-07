@@ -19,8 +19,14 @@ export async function getHunter(id: number): Promise<Hunter> {
   return fetcher<Hunter>(`/api/hunters/${id}`);
 }
 
-export async function getHunters(): Promise<Hunter[]> {
-  return fetcher<Hunter[]>("/api/hunters");
+export async function getHunters(params?: {
+  search?: string;
+  ordering?: string;
+}): Promise<Hunter[]> {
+  const query = new URLSearchParams(
+    params as Record<string, string>
+  ).toString();
+  return fetcher<Hunter[]>(`/api/hunters${query ? `?${query}` : ""}`);
 }
 
 export async function registerHunter(

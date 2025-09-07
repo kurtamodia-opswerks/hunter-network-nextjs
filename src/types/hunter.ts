@@ -22,8 +22,8 @@ export interface Hunter {
   guild: number | null;
   guild_name?: string;
   skills: number[];
-  power_level: number | string;
-  raid_count: number | string;
+  power_level: number;
+  raid_count: number;
 }
 
 export interface UpdateHunterData {

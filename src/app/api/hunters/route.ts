@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   const apiUrl = `${DJANGO_API_URL}/hunters/${
     searchParams ? `?${searchParams}` : ""
   }`;
+  console.log(apiUrl);
 
   return proxyFetch(apiUrl, { method: "GET" }, token);
 }
