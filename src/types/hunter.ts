@@ -11,22 +11,28 @@ export interface RegisterHunterData {
 
 export interface Hunter {
   id: number;
+  date_joined: string;
+  first_name: string;
+  last_name: string;
   full_name: string;
   email: string;
+  username: string;
   rank: string;
   rank_display: string;
+  guild: number | null;
   guild_name?: string;
-  power_level: number;
-  raid_count: number;
+  skills: number[];
+  power_level: number | string;
+  raid_count: number | string;
 }
 
 export interface UpdateHunterData {
   email: string;
-  guild: number;
+  guild: number | null;
   skills: number[];
   first_name: string;
   last_name: string;
   username: string;
-  password: string;
+  password?: string;
   rank: string;
 }

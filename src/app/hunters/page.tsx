@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import HunterCard from "@/components/hunters/HunterCard";
 import { useAuthState } from "@/store/useAuthStore";
-import { getHunters, Hunter } from "@/lib/api";
+import { getHunters } from "@/lib/api";
+import { Hunter } from "@/types/hunter";
 
 export default function HuntersPage() {
   const { isLoggedIn } = useAuthState();
