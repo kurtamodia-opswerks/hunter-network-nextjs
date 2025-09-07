@@ -11,10 +11,14 @@ import { Button } from "@/components/ui/button";
 export default function HunterPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { user } = useAuthState();
+  const { user, isLoggedIn } = useAuthState();
+
+  const [mounted, setMounted] = useState(false);
 
   const [hunter, setHunter] = useState<Hunter | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!id || !user) return;
@@ -34,6 +38,15 @@ export default function HunterPage() {
 
     loadHunter();
   }, [id]);
+
+  if (!isLoggedIn || !mounted) {
+    return (
+      <div className="text-center mt-20">
+        <h2 className="text-2xl font-semibold mb-4">You are not logged in</h2>
+        <p className="text-lg">Please log in to view the Hunter Page.</p>
+      </div>
+    );
+  }
 
   if (loading) return <p className="text-center mt-20">Loading hunter...</p>;
   if (!hunter) return <p className="text-center mt-20">Hunter not found.</p>;

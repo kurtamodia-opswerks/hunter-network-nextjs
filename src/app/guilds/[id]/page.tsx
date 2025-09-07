@@ -15,10 +15,14 @@ import GuildMembers from "@/components/guilds/guild-page/GuildMembers";
 export default function GuildPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { user } = useAuthState();
+  const { user, isLoggedIn } = useAuthState();
+
+  const [mounted, setMounted] = useState(false);
 
   const [guild, setGuild] = useState<Guild | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!id || !user) return;
@@ -39,6 +43,14 @@ export default function GuildPage() {
     loadGuild();
   }, [id]);
 
+  if (!isLoggedIn || !mounted) {
+    return (
+      <div className="text-center mt-20">
+        <h2 className="text-2xl font-semibold mb-4">You are not logged in</h2>
+        <p className="text-lg">Please log in to view the Guild Page.</p>
+      </div>
+    );
+  }
   if (loading) return <p className="text-center mt-20">Loading guild...</p>;
   if (!guild) return <p className="text-center mt-20">Guild not found.</p>;
 
