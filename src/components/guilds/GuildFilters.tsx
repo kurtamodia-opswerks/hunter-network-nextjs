@@ -1,6 +1,13 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 interface GuildsFiltersProps {
   search: string;
@@ -29,16 +36,17 @@ export default function GuildFilters({
         className="border px-3 py-2 rounded-lg w-64"
       />
 
-      <select
-        value={ordering}
-        onChange={(e) => setOrdering(e.target.value)}
-        className="border px-3 py-2 rounded-lg"
-      >
-        <option value="name">Name ↑</option>
-        <option value="-name">Name ↓</option>
-        <option value="created_at">Created At ↑</option>
-        <option value="-created_at">Created At ↓</option>
-      </select>
+      <Select value={ordering} onValueChange={(val) => setOrdering(val)}>
+        <SelectTrigger className="w-48">
+          <SelectValue placeholder="Sort by" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="name">Name ↑</SelectItem>
+          <SelectItem value="-name">Name ↓</SelectItem>
+          <SelectItem value="created_at">Created At ↑</SelectItem>
+          <SelectItem value="-created_at">Created At ↓</SelectItem>
+        </SelectContent>
+      </Select>
 
       {loading && !firstLoad && (
         <Loader2 className="animate-spin text-gray-500 w-5 h-5" />

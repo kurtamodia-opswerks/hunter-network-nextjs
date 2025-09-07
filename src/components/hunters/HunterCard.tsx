@@ -1,3 +1,5 @@
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -6,73 +8,64 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface Hunter {
-  id: number;
-  full_name: string;
-  email: string;
-  rank: string;
-  rank_display: string;
-  guild_name?: string;
-  power_level: number;
-  raid_count: number;
-}
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Hunter } from "@/types/hunter";
 
 interface HunterCardProps {
   hunter: Hunter;
-  isAdmin?: boolean;
 }
 
-export default function HunterCard({
-  hunter,
-  isAdmin = false,
-}: HunterCardProps) {
-  return (
-    <Card className="shadow-md">
-      <CardHeader>
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <CardTitle>{hunter.full_name}</CardTitle>
-          {hunter.guild_name && <Badge>{hunter.guild_name}</Badge>}
-          <Badge
-            variant={
-              hunter.rank === "S"
-                ? "destructive"
-                : hunter.rank === "A"
-                ? "secondary"
-                : "outline"
-            }
-          >
-            {hunter.rank_display}
-          </Badge>
-        </div>
-        <CardDescription>{hunter.email}</CardDescription>
-      </CardHeader>
+export default function HunterCard({ hunter }: HunterCardProps) {
+  const router = useRouter();
 
-      <CardContent className="space-y-2">
-        {isAdmin ? (
-          <div className="grid grid-cols-2 gap-4">
-            <p>
-              <span className="font-semibold">Power Level:</span>{" "}
-              {hunter.power_level}
-            </p>
-            <p>
-              <span className="font-semibold">Raid Count:</span>{" "}
-              {hunter.raid_count}
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-row justify-between items-center">
-            <p>
-              Power Level:{" "}
-              <span className="font-medium">{hunter.power_level}</span>
-            </p>
-            <p>
-              Raid Count:{" "}
-              <span className="font-medium">{hunter.raid_count}</span>
-            </p>
-          </div>
-        )}
-      </CardContent>
+  return (
+    <Card className="shadow-md w-xl">
+      <div className="flex items-center gap-4 p-4">
+        {/* Avatar Section */}
+        <Avatar className="h-16 w-16">
+          <AvatarImage
+            src={`/avatars/${hunter.id}.png`}
+            alt={hunter.full_name}
+          />
+          <AvatarFallback>
+            {hunter.full_name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+
+        {/* Right Side Info */}
+        <div className="flex-1">
+          <CardHeader className="p-0">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <CardTitle>{hunter.full_name}</CardTitle>
+              <Badge
+                variant={
+                  hunter.rank === "S"
+                    ? "destructive"
+                    : hunter.rank === "A"
+                    ? "secondary"
+                    : "outline"
+                }
+              >
+                {hunter.rank_display}
+              </Badge>
+            </div>
+            <CardDescription>{hunter.email}</CardDescription>
+          </CardHeader>
+
+          <CardContent className="p-0 mt-3">
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/hunters/${hunter.id}`)}
+            >
+              View Hunter Page
+            </Button>
+          </CardContent>
+        </div>
+      </div>
     </Card>
   );
 }

@@ -3,14 +3,13 @@ import { Guild } from "@/types/guild";
 
 interface GuildListProps {
   guilds: Guild[];
-  isAdmin: boolean;
 }
 
-export default function GuildList({ guilds, isAdmin }: GuildListProps) {
+export default function GuildList({ guilds }: GuildListProps) {
   return (
     <div className="space-y-4">
       {guilds.map((g) => (
-        <GuildCard key={g.id} guild={g} isAdmin={isAdmin} />
+        <GuildCard key={g.id} guild={g} />
       ))}
     </div>
   );

@@ -70,7 +70,7 @@ export default function GuildsPage() {
         firstLoad={firstLoad}
       />
 
-      <GuildList guilds={guilds} isAdmin={!!user?.is_admin} />
+      <GuildList guilds={guilds} />
     </div>
   );
 }

@@ -80,7 +80,7 @@ export default function HuntersPage() {
         </div>
       )}
 
-      <HunterList hunters={hunters} isAdmin={!!user?.is_admin} />
+      <HunterList hunters={hunters} />
     </div>
   );
 }
