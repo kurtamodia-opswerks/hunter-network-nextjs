@@ -16,10 +16,17 @@ export async function POST(req: NextRequest) {
     const res = NextResponse.json(data, { status: response.status });
 
     res.cookies.set("access_token", data.access, {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 60 * 60, // 1 hour
+    });
+
+    res.cookies.set("refresh_token", data.refresh, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return res;

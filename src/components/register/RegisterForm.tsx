@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { registerHunter, RegisterHunterData } from "@/lib/api";
+
+import { registerHunter } from "@/lib/api";
+import { RegisterHunterData } from "@/types/hunter";
 
 export default function RegisterForm() {
   const router = useRouter();
