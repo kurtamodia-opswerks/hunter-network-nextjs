@@ -42,20 +42,23 @@ export default function ProfilePage() {
   const { getHunter, updateHunter } = useHunterActions();
 
   const [formData, setFormData] = useState<UpdateHunterData | null>(null);
+  const [initialFormData, setInitialFormData] =
+    useState<UpdateHunterData | null>(null);
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Load profile from store
+  // Load hunter data
   useEffect(() => {
     if (!user) return;
     getHunter(user.user_id);
   }, [user]);
 
-  // Sync formData when hunter changes
+  // Sync formData and initialFormData when hunter changes
   useEffect(() => {
     if (!hunter) return;
-    setFormData({
+
+    const data: UpdateHunterData = {
       first_name: hunter.first_name || "",
       last_name: hunter.last_name || "",
       username: hunter.username || "",
@@ -64,15 +67,36 @@ export default function ProfilePage() {
       guild: hunter.guild ?? null,
       skills: hunter.skills || [],
       rank: hunter.rank || "E",
-    });
+    };
+
+    setFormData(data);
+    setInitialFormData(data);
   }, [hunter]);
 
-  if (!hunter || !formData)
-    return (
-      <p className="flex w-full items-center justify-center">
-        Loading profile...
-      </p>
-    );
+  // Check if form has changed
+  const isChanged = () => {
+    if (!formData || !initialFormData) return false;
+
+    for (const key in formData) {
+      const k = key as keyof UpdateHunterData;
+
+      // Ignore blank password
+      if (k === "password" && !formData.password) continue;
+
+      const current = formData[k];
+      const initial = initialFormData[k];
+
+      if (Array.isArray(current) && Array.isArray(initial)) {
+        if (JSON.stringify(current) !== JSON.stringify(initial)) return true;
+      } else {
+        if (current !== initial) return true;
+      }
+    }
+
+    return false;
+  };
+
+  if (!hunter || !formData) return null; // handled by loading.tsx
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -89,6 +113,7 @@ export default function ProfilePage() {
 
   const handleConfirmSubmit = async () => {
     if (!hunter || !formData) return;
+
     setLoading(true);
     try {
       const result = await verifyPassword(confirmPassword);
@@ -103,11 +128,16 @@ export default function ProfilePage() {
         guild: formData.guild ? Number(formData.guild) : null,
         skills: formData.skills.map(Number),
       };
+
       await updateHunter(hunter.id, payload);
 
       toast.success("Profile updated successfully!");
       setConfirmOpen(false);
       setConfirmPassword("");
+
+      // Update initial form data to prevent save button from staying enabled
+      setInitialFormData({ ...payload, password: "" });
+      setFormData({ ...formData, password: "" });
     } catch (err: unknown) {
       if (err instanceof Error) toast.error(err.message);
       else toast.error("An unexpected error occurred");
@@ -188,21 +218,24 @@ export default function ProfilePage() {
           </CardContent>
 
           <CardFooter className="flex justify-end gap-2">
-            <Button type="button" onClick={handleSaveClick}>
+            <Button
+              type="button"
+              onClick={handleSaveClick}
+              disabled={!isChanged()}
+            >
               Save
             </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                router.push("/");
-              }}
+              onClick={() => router.push("/")}
             >
-              Cancel
+              Go Back
             </Button>
           </CardFooter>
         </form>
       </Card>
+
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
