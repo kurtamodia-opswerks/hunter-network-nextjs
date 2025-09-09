@@ -4,6 +4,10 @@
 import { useState } from "react";
 import { useAuthActions, useAuthState } from "@/store/useAuthStore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import ThemeToggle from "@/components/navbar/ThemeToggle";
+
 import {
   NavigationMenuList,
   NavigationMenuItem,
@@ -25,7 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { LogIn } from "lucide-react";
 
 export default function UserMenu() {
   const router = useRouter();
@@ -44,10 +48,16 @@ export default function UserMenu() {
     return (
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuLink asChild>
-            <Link href="/login">Login / Register</Link>
+          <NavigationMenuLink asChild className="flex flex-row gap-2">
+            <Link href="/login">
+              <LogIn />
+              Login
+            </Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+        </div>
       </NavigationMenuList>
     );
   }
@@ -73,6 +83,9 @@ export default function UserMenu() {
             Logout
           </DropdownMenuItem>
         </DropdownMenuContent>
+        <div className="flex items-center gap-2 ml-4">
+          <ThemeToggle />
+        </div>
       </DropdownMenu>
 
       <Dialog open={openLogoutDialog} onOpenChange={setOpenLogoutDialog}>
